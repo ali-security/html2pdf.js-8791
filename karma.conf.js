@@ -95,7 +95,7 @@ module.exports = function(config) {
         rules: [
           {
             test: /\.m?js$/,
-            exclude: /node_modules/,
+            exclude: [/node_modules/, /src[\\/]vendor/],
             use: ['babel-loader'],
           },
         ],
