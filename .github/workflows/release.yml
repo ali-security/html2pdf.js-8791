@@ -1,10 +1,9 @@
 name: Release
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 jobs:
   release:
+    if: false
     timeout-minutes: 2
     runs-on: ubuntu-latest
     steps:
