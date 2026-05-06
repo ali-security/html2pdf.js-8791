@@ -31,10 +31,13 @@ jobs:
           CI: 'true'
         run: npx karma start karma.conf.js --single-run --browsers ChromeHeadless
 
+      - name: Pack
+        run: npm pack
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: html2pdf-dist
-          path: dist/
+          name: html2pdf.js-tarball
+          path: '*.tgz'
           retention-days: 1
           if-no-files-found: error
