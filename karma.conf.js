@@ -1,6 +1,26 @@
 // Karma configuration
 
 module.exports = function(config) {
+  // In CI we skip the interactive pdftest snapshot suite, which would
+  // otherwise hang waiting for human approval in a headless browser.
+  var isCI = !!process.env.CI;
+
+  var files = [
+    { pattern: 'src/index.js', watched: false, served: true },
+    { pattern: 'test/**/*.js', watched: true },
+  ];
+  var exclude = ['test/manual/'];
+
+  if (isCI) {
+    exclude.push('test/snapshot.js');
+  } else {
+    files.push(
+      { pattern: 'test/reference/*.*', included: false, served: true },
+      { pattern: require.resolve('pdftest/dist/pdftest.client.min.js'), watched: false },
+      { pattern: require.resolve('pdftest/dist/chai-pdftest.min.js'), watched: false }
+    );
+  }
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -13,19 +33,11 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
-    files: [
-      { pattern: 'src/index.js', watched: false, served: true },
-      { pattern: 'test/**/*.js', watched: true },
-      { pattern: 'test/reference/*.*', included: false, served: true },
-      { pattern: require.resolve('pdftest/dist/pdftest.client.min.js'), watched: false },
-      { pattern: require.resolve('pdftest/dist/chai-pdftest.min.js'), watched: false },
-    ],
+    files: files,
 
 
     // list of files / patterns to exclude
-    exclude: [
-      'test/manual/',
-    ],
+    exclude: exclude,
 
 
     // preprocess matching files before serving them to the browser
@@ -74,7 +86,8 @@ module.exports = function(config) {
 
 
     // Remove timeouts so the PDF snapshot GUI can wait on user feedback.
-    browserNoActivityTimeout: 0,
+    // In CI there is no GUI to wait on, so use a sane timeout instead.
+    browserNoActivityTimeout: isCI ? 60000 : 0,
 
 
     // Suppress console.log messages
